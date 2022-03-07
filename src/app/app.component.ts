@@ -1,6 +1,6 @@
 import { Component, OnInit, VERSION } from '@angular/core';
 import { EMPTY, Observable } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { Client, Post } from './client/client';
 
 @Component({
@@ -16,6 +16,15 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.posts$ = this.client.posts$.pipe(
+      map((posts) =>
+        posts.map(
+          (post) =>
+            ({
+              ...post,
+              title: post?.title?.toUpperCase(),
+            } as Post)
+        )
+      ),
       catchError((e) => {
         this.handleError(e);
         return EMPTY;
@@ -23,7 +32,7 @@ export class AppComponent implements OnInit {
     );
   }
 
-  handleError(error: any) {
+  handleError(error: any): void {
     console.error(error);
   }
 }
