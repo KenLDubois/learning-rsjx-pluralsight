@@ -1,5 +1,5 @@
 import { Component, OnInit, VERSION } from '@angular/core';
-import { EMPTY, from, map, Observable, of, take, tap } from 'rxjs';
+import { EMPTY, Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Client, Post } from './client/client';
 
@@ -15,9 +15,8 @@ export class AppComponent implements OnInit {
   constructor(private client: Client) {}
 
   ngOnInit(): void {
-    this.posts$ = this.client.getPosts().pipe(
+    this.posts$ = this.client.posts$.pipe(
       catchError((e) => {
-        //throw new Error('uuh oh!')
         this.handleError(e);
         return EMPTY;
       })

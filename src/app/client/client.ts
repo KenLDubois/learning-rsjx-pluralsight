@@ -19,6 +19,7 @@ export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL'); //'https
 
 export interface IClient {
   getPosts(): Observable<Post[]>;
+  posts$?: Observable<Post[]>;
 }
 
 @Injectable()
@@ -27,6 +28,8 @@ export class Client implements IClient {
   private baseUrl: string;
   protected jsonParseReviver: ((key: string, value: any) => any) | undefined =
     undefined;
+
+  public posts$: Observable<Post[]>;
 
   constructor(
     @Inject(HttpClient) http: HttpClient,
@@ -37,6 +40,8 @@ export class Client implements IClient {
       baseUrl !== undefined && baseUrl !== null
         ? baseUrl
         : '/junctiondealservices';
+
+    this.posts$ = this.getPosts();
   }
 
   /*
