@@ -15,10 +15,12 @@ import {
   HttpResponseBase,
 } from '@angular/common/http';
 
-export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL'); //'https://jsonplaceholder.typicode.com'; //new InjectionToken<string>('API_BASE_URL');
+//FOR MORE INFO: https://jsonplaceholder.typicode.com/guide/
+export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL'); //'https://jsonplaceholder.typicode.com';
 
 export interface IClient {
   getPosts(): Observable<Post[]>;
+  getComments(): Observable<Comment[]>;
   posts$?: Observable<Post[]>;
 }
 
@@ -30,6 +32,7 @@ export class Client implements IClient {
     undefined;
 
   public posts$: Observable<Post[]>;
+  public comments$: Observable<Comment[]>;
 
   constructor(
     @Inject(HttpClient) http: HttpClient,
@@ -42,6 +45,7 @@ export class Client implements IClient {
         : '/junctiondealservices';
 
     this.posts$ = this.getPosts();
+    this.comments$ = this.getComments();
   }
 
   /*
@@ -128,14 +132,100 @@ export class Client implements IClient {
     }
     return new Observable<Post[]>();
   }
+
+  getComments(): Observable<Comment[]> {
+    let url_ = this.baseUrl + '/posts';
+    url_ = url_.replace(/[?&]$/, '');
+
+    let options_: any = {
+      body: '',
+      observe: 'response',
+      responseType: 'blob',
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+      }),
+    };
+
+    return this.http
+      .request('get', url_, options_)
+      .pipe(
+        _observableMergeMap((response_: any) => {
+          return this.processGetComments(response_);
+        })
+      )
+      .pipe(
+        _observableCatch((response_: any) => {
+          if (response_ instanceof HttpResponseBase) {
+            try {
+              return this.processGetComments(<any>response_);
+            } catch (e) {
+              // return <Observable<Post[]>>(<any>_observableThrow(e));
+              throw new Error('something went wrong.');
+            }
+          } else throw new Error('something went wrong.'); //return <Observable<Post[]>>(<any>_observableThrow(response_));
+        })
+      );
+  }
+
+  protected processGetComments(
+    response: HttpResponseBase
+  ): Observable<Comment[]> {
+    const status = response.status;
+    const responseBlob =
+      response instanceof HttpResponse
+        ? response.body
+        : (<any>response).error instanceof Blob
+        ? (<any>response).error
+        : undefined;
+
+    let _headers: any = {};
+    if (response.headers) {
+      for (let key of response.headers.keys()) {
+        _headers[key] = response.headers.get(key);
+      }
+    }
+    if (status === 200) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText) => {
+          let result200: any = null;
+          let resultData200 =
+            _responseText === ''
+              ? null
+              : JSON.parse(_responseText, this.jsonParseReviver);
+          result200 = [] as Comment[]; //GetDealsResponse.fromJS(resultData200);
+
+          if (Array.isArray(resultData200)) {
+            // this.services = [] as any;
+            for (let item of resultData200) result200!.push(item);
+          }
+
+          return _observableOf(result200);
+        })
+      );
+    } else if (status !== 200 && status !== 204) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText) => {
+          return throwException(
+            'An unexpected server error occurred.',
+            status,
+            _responseText,
+            _headers
+          );
+        })
+      );
+    }
+    return new Observable<Comment[]>();
+  }
 }
 
+// POSTS
 export interface IPost {
   postId?: number | undefined;
   id?: number | undefined;
   title?: string | undefined;
   email?: string | undefined;
   body?: string | undefined;
+  comments?: Comment[] | undefined;
 }
 
 export class Post implements IPost {
@@ -144,6 +234,7 @@ export class Post implements IPost {
   title?: string | undefined;
   email?: string | undefined;
   body?: string | undefined;
+  comments?: Comment[] | undefined;
 
   constructor(data?: IPost) {
     if (data) {
@@ -176,6 +267,59 @@ export class Post implements IPost {
     data['postId'] = this.postId;
     data['id'] = this.id;
     data['title'] = this.title;
+    data['email'] = this.email;
+    data['body'] = this.body;
+    return data;
+  }
+}
+
+// COMMENTS:
+export interface IComment {
+  postId?: number | undefined;
+  id?: number | undefined;
+  name?: string | undefined;
+  email?: string | undefined;
+  body?: string | undefined;
+}
+
+export class Comment implements IComment {
+  postId?: number | undefined;
+  id?: number | undefined;
+  name?: string | undefined;
+  email?: string | undefined;
+  body?: string | undefined;
+
+  constructor(data?: IComment) {
+    if (data) {
+      for (var property in data) {
+        if (data.hasOwnProperty(property))
+          (<any>this)[property] = (<any>data)[property];
+      }
+    }
+  }
+
+  init(_data?: any) {
+    if (_data) {
+      this.postId = _data['postId'];
+      this.id = _data['id'];
+      this.name = _data['name'];
+      this.email = _data['email'];
+      this.body = _data['body'];
+    }
+  }
+
+  static fromJS(data: any): Comment {
+    data = typeof data === 'object' ? data : {};
+    let result = new Post();
+    result.init(data);
+    return result;
+  }
+
+  toJSON(data?: any) {
+    data = typeof data === 'object' ? data : {};
+    data['postId'] = this.postId;
+    data['id'] = this.id;
+    data['name'] = this.name;
     data['email'] = this.email;
     data['body'] = this.body;
     return data;

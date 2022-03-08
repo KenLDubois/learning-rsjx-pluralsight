@@ -1,5 +1,5 @@
-import { Component, OnInit, VERSION } from '@angular/core';
-import { EMPTY, Observable } from 'rxjs';
+import { Component, VERSION } from '@angular/core';
+import { combineLatest, EMPTY } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { Client, Post } from './client/client';
 
@@ -8,29 +8,32 @@ import { Client, Post } from './client/client';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   name = 'Angular ' + VERSION.major;
-  posts$: Observable<Post[]> | undefined;
+
+  postsWithComments$ = combineLatest([
+    this.client.posts$,
+    this.client.comments$,
+  ]).pipe(
+    map(([posts, comments]) =>
+      posts.map(
+        (post) =>
+          ({
+            ...post,
+            title: post?.title?.toUpperCase(),
+            comments: comments?.filter((c) => {
+              return c?.postId && c?.postId == post?.postId;
+            }),
+          } as Post)
+      )
+    ),
+    catchError((e) => {
+      this.handleError(e);
+      return EMPTY;
+    })
+  );
 
   constructor(private client: Client) {}
-
-  ngOnInit(): void {
-    this.posts$ = this.client.posts$.pipe(
-      map((posts) =>
-        posts.map(
-          (post) =>
-            ({
-              ...post,
-              title: post?.title?.toUpperCase(),
-            } as Post)
-        )
-      ),
-      catchError((e) => {
-        this.handleError(e);
-        return EMPTY;
-      })
-    );
-  }
 
   handleError(error: any): void {
     console.error(error);
