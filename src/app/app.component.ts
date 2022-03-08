@@ -1,6 +1,6 @@
 import { Component, VERSION } from '@angular/core';
 import { combineLatest, EMPTY } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, map, take, tap } from 'rxjs/operators';
 import { Client, Post } from './client/client';
 
 @Component({
@@ -22,7 +22,7 @@ export class AppComponent {
             ...post,
             title: post?.title?.toUpperCase(),
             comments: comments?.filter((c) => {
-              return c?.postId && c?.postId == post?.postId;
+              return c?.postId && c?.postId == post?.id;
             }),
           } as Post)
       )

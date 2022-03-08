@@ -134,7 +134,7 @@ export class Client implements IClient {
   }
 
   getComments(): Observable<Comment[]> {
-    let url_ = this.baseUrl + '/posts';
+    let url_ = this.baseUrl + '/comments';
     url_ = url_.replace(/[?&]$/, '');
 
     let options_: any = {

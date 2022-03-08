@@ -1,19 +1,28 @@
 <hello name="{{ name }}"></hello>
+
 <p>Start editing to see some magic happen :)</p>
+
+<hr />
+<hr />
+
 <ul *ngIf="postsWithComments$ | async as posts">
   <li *ngFor="let post of posts">
-    <strong>{{ post?.postId }}</strong>
-    {{ post?.title }}
-    <p *ngIf="post?.comments">Comments: {{ post.comments.length }}</p>
+    <strong>{{ post?.title }}</strong>
+    <p *ngIf="post?.comments">
+      Comments
+      <strong>({{ post.comments.length }})</strong>
+      :
+    </p>
     <ul *ngIf="post?.comments">
       <li *ngFor="let comment of post.comments">
-        {{ comment?.name }}
+        <strong>{{ comment?.name }}</strong>
         <p>
-          <strong>comment post id: {{ comment?.postId }}</strong>
           {{ comment?.body }}
         </p>
       </li>
     </ul>
+    <br />
     <hr />
+    <br />
   </li>
 </ul>
