@@ -1,5 +1,5 @@
 import { Component, OnInit, VERSION } from '@angular/core';
-import { combineLatest, EMPTY, Subject } from 'rxjs';
+import { BehaviorSubject, combineLatest, EMPTY, Subject } from 'rxjs';
 import { catchError, map, take, tap } from 'rxjs/operators';
 import { Client, Post } from './client/client';
 
@@ -11,7 +11,7 @@ import { Client, Post } from './client/client';
 export class AppComponent implements OnInit {
   name = 'Angular ' + VERSION.major;
 
-  private userSelectedSubject = new Subject<number>();
+  private userSelectedSubject = new BehaviorSubject<number>(-1);
   userSelectedAction$ = this.userSelectedSubject.asObservable();
 
   users$ = this.client.users$;
@@ -44,7 +44,7 @@ export class AppComponent implements OnInit {
   ]).pipe(
     map(([posts, userId]) =>
       posts.filter((post) => {
-        true;
+        return userId && userId > -1 ? post?.userId == userId : true;
       })
     )
   );
@@ -58,9 +58,9 @@ export class AppComponent implements OnInit {
     console.error(error);
   }
 
-  onUserSelected(userId?: any): void {
-    console.log(userId);
-    if (userId && +userId > -1) {
+  onUserSelected(e?: HTMLSelectElement): void {
+    let userId = e?.value;
+    if (userId) {
       this.userSelectedSubject.next(+userId);
     }
   }

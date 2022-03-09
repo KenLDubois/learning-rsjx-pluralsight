@@ -4,8 +4,13 @@
 
 <div *ngIf="users$ | async as users">
   <label for="user">Filter By User:</label>
-  <select name="user" id="user" (change)="onUserSelected('test')">
-    <option value="-1">SELECT</option>
+  <select
+    #selectedUser
+    name="user"
+    id="user"
+    (change)="onUserSelected(selectedUser)"
+  >
+    <option value="-1">SHOW ALL</option>
     <option *ngFor="let user of users" [value]="user?.id">
       {{ user?.name }} ({{ user?.id }})
     </option>
