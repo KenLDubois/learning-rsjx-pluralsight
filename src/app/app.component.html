@@ -2,12 +2,26 @@
 
 <p>Start editing to see some magic happen :)</p>
 
+<div *ngIf="users$ | async as users">
+  <label for="user">Filter By User:</label>
+  <select name="user" id="user" (change)="onUserSelected('test')">
+    <option value="-1">SELECT</option>
+    <option *ngFor="let user of users" [value]="user?.id">
+      {{ user?.name }} ({{ user?.id }})
+    </option>
+  </select>
+</div>
+
 <hr />
 <hr />
 
-<ul *ngIf="postsWithComments$ | async as posts">
+<ul *ngIf="posts$ | async as posts">
   <li *ngFor="let post of posts">
     <strong>{{ post?.title }}</strong>
+    <p>
+      <i>- User: {{ post?.userId }}</i>
+    </p>
+
     <p *ngIf="post?.comments">
       Comments
       <strong>({{ post.comments.length }})</strong>
