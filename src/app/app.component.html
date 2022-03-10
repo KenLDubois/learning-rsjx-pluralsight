@@ -3,7 +3,7 @@
 <p>Start editing to see some magic happen :)</p>
 
 <div *ngIf="users$ | async as users">
-  <label for="user">Filter By User:</label>
+  <label for="user">Filter By User: </label>
   <select
     #selectedUser
     name="user"
@@ -12,7 +12,7 @@
   >
     <option value="-1">SHOW ALL</option>
     <option *ngFor="let user of users" [value]="user?.id">
-      {{ user?.name }} ({{ user?.id }})
+      {{ user?.name }}
     </option>
   </select>
 </div>
@@ -45,3 +45,9 @@
     <br />
   </li>
 </ul>
+
+<p *ngIf="errorMessage$ | async as errorMessage">
+  <i>
+    {{ errorMessage }}
+  </i>
+</p>

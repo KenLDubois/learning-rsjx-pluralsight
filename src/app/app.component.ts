@@ -4,7 +4,7 @@ import {
   OnInit,
   VERSION,
 } from '@angular/core';
-import { BehaviorSubject, combineLatest, EMPTY } from 'rxjs';
+import { BehaviorSubject, combineLatest, EMPTY, Subject } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { PostsService } from './services/posts.service';
 
@@ -20,6 +20,9 @@ export class AppComponent implements OnInit {
   private userSelectedSubject = new BehaviorSubject<number>(-1);
   userSelectedAction$ = this.userSelectedSubject.asObservable();
 
+  private errorMessageSubject = new Subject<string>();
+  errorMessage$ = this.errorMessageSubject.asObservable();
+
   users$ = this.service.users$;
 
   posts$ = combineLatest([
@@ -30,7 +33,11 @@ export class AppComponent implements OnInit {
       posts.filter((post) => {
         return userId && userId > -1 ? post?.userId == userId : true;
       })
-    )
+    ),
+    catchError((err) => {
+      this.errorMessageSubject.next(err);
+      return EMPTY;
+    })
   );
 
   constructor(private service: PostsService) {}
