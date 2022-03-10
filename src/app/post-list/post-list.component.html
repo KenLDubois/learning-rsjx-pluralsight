@@ -27,3 +27,7 @@
     {{ post?.title }}
   </li>
 </ol>
+
+<i *ngIf="errorMessage$ | async as errorMessage">
+  {{ errorMessage }}
+</i>

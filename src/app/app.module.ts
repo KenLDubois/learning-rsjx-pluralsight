@@ -20,7 +20,10 @@ import { PostDetailComponent } from './post-detail/post-detail.component';
   ],
   providers: [
     Client,
-    { provide: API_BASE_URL, useValue: 'https://jsonplaceholder.typicode.com' },
+    {
+      provide: API_BASE_URL,
+      useValue: 'https://jsonplaceholder.typicode.com',
+    },
     PostsService,
   ],
   bootstrap: [AppComponent],
