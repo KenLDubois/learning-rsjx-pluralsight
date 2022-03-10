@@ -1,0 +1,29 @@
+<div>
+  <label for="user">User: </label>
+  <br />
+  <select
+    name="user"
+    id="user"
+    *ngIf="users$ | async as users"
+    #usersDdl
+    (change)="onUserSelected(usersDdl)"
+  >
+    <option value="-1">-- ALL --</option>
+    <option *ngFor="let user of users" [value]="user?.id">
+      {{ user?.name }}
+    </option>
+  </select>
+</div>
+<br />
+<strong>POSTS</strong>
+<hr />
+<ol *ngIf="posts$ | async as posts">
+  <li
+    *ngFor="let post of posts"
+    class="post"
+    (click)="onPostSelected(post?.id)"
+    [ngClass]="{ active: post?.id == (selectedPost$ | async)?.id }"
+  >
+    {{ post?.title }}
+  </li>
+</ol>

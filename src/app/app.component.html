@@ -1,53 +1,5 @@
 <hello name="{{ name }}"></hello>
-
-<p>Start editing to see some magic happen :)</p>
-
-<div *ngIf="users$ | async as users">
-  <label for="user">Filter By User: </label>
-  <select
-    #selectedUser
-    name="user"
-    id="user"
-    (change)="onUserSelected(selectedUser)"
-  >
-    <option value="-1">SHOW ALL</option>
-    <option *ngFor="let user of users" [value]="user?.id">
-      {{ user?.name }}
-    </option>
-  </select>
+<div class="flex">
+  <app-post-list class="list"></app-post-list>
+  <app-post-detail class="post"></app-post-detail>
 </div>
-
-<hr />
-<hr />
-
-<ul *ngIf="posts$ | async as posts">
-  <li *ngFor="let post of posts">
-    <strong>{{ post?.title.toUpperCase() }}</strong>
-    <p>
-      <i>- {{ post?.user?.name }}</i>
-    </p>
-
-    <p *ngIf="post?.comments">
-      Comments
-      <strong>({{ post.comments.length }})</strong>
-      :
-    </p>
-    <ul *ngIf="post?.comments">
-      <li *ngFor="let comment of post.comments">
-        <strong>{{ comment?.name }}</strong>
-        <p>
-          {{ comment?.body }}
-        </p>
-      </li>
-    </ul>
-    <br />
-    <hr />
-    <br />
-  </li>
-</ul>
-
-<p *ngIf="errorMessage$ | async as errorMessage">
-  <i>
-    {{ errorMessage }}
-  </i>
-</p>
