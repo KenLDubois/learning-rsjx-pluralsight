@@ -22,9 +22,9 @@
 
 <ul *ngIf="posts$ | async as posts">
   <li *ngFor="let post of posts">
-    <strong>{{ post?.title }}</strong>
+    <strong>{{ post?.title.toUpperCase() }}</strong>
     <p>
-      <i>- User: {{ post?.userId }}</i>
+      <i>- {{ post?.user?.name }}</i>
     </p>
 
     <p *ngIf="post?.comments">

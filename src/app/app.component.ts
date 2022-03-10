@@ -1,12 +1,18 @@
-import { Component, OnInit, VERSION } from '@angular/core';
-import { BehaviorSubject, combineLatest, EMPTY, Subject } from 'rxjs';
-import { catchError, map, take, tap } from 'rxjs/operators';
-import { Client, Post } from './client/client';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnInit,
+  VERSION,
+} from '@angular/core';
+import { BehaviorSubject, combineLatest, EMPTY } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import { PostsService } from './services/posts.service';
 
 @Component({
   selector: 'my-app',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent implements OnInit {
   name = 'Angular ' + VERSION.major;
@@ -14,32 +20,10 @@ export class AppComponent implements OnInit {
   private userSelectedSubject = new BehaviorSubject<number>(-1);
   userSelectedAction$ = this.userSelectedSubject.asObservable();
 
-  users$ = this.client.users$;
-
-  postsWithComments$ = combineLatest([
-    this.client.posts$,
-    this.client.comments$,
-  ]).pipe(
-    map(([posts, comments]) =>
-      posts.map(
-        (post) =>
-          ({
-            ...post,
-            title: post?.title?.toUpperCase(),
-            comments: comments?.filter((c) => {
-              return c?.postId && c?.postId == post?.id;
-            }),
-          } as Post)
-      )
-    ),
-    catchError((e) => {
-      this.handleError(e);
-      return EMPTY;
-    })
-  );
+  users$ = this.service.users$;
 
   posts$ = combineLatest([
-    this.postsWithComments$,
+    this.service.postsWithUsersAndComments$,
     this.userSelectedAction$,
   ]).pipe(
     map(([posts, userId]) =>
@@ -49,13 +33,10 @@ export class AppComponent implements OnInit {
     )
   );
 
-  constructor(private client: Client) {}
+  constructor(private service: PostsService) {}
+
   ngOnInit(): void {
     this.userSelectedSubject.next(-1);
-  }
-
-  handleError(error: any): void {
-    console.error(error);
   }
 
   onUserSelected(e?: HTMLSelectElement): void {

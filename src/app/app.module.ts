@@ -6,6 +6,7 @@ import { AppComponent } from './app.component';
 import { HelloComponent } from './hello.component';
 import { API_BASE_URL, Client } from './client/client';
 import { HttpClientModule } from '@angular/common/http';
+import { PostsService } from './services/posts.service';
 
 @NgModule({
   imports: [BrowserModule, FormsModule, HttpClientModule],
@@ -13,6 +14,7 @@ import { HttpClientModule } from '@angular/common/http';
   providers: [
     Client,
     { provide: API_BASE_URL, useValue: 'https://jsonplaceholder.typicode.com' },
+    PostsService,
   ],
   bootstrap: [AppComponent],
 })

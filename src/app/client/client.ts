@@ -22,10 +22,6 @@ export interface IClient {
   getPosts(): Observable<Post[]>;
   getComments(): Observable<Comment[]>;
   getUsers(): Observable<User[]>;
-
-  posts$: Observable<Post[]>;
-  comments$: Observable<Comment[]>;
-  users$: Observable<User[]>;
 }
 
 @Injectable()
@@ -34,10 +30,6 @@ export class Client implements IClient {
   private baseUrl: string;
   protected jsonParseReviver: ((key: string, value: any) => any) | undefined =
     undefined;
-
-  public posts$: Observable<Post[]>;
-  public comments$: Observable<Comment[]>;
-  users$: Observable<User[]>;
 
   constructor(
     @Inject(HttpClient) http: HttpClient,
@@ -48,10 +40,6 @@ export class Client implements IClient {
       baseUrl !== undefined && baseUrl !== null
         ? baseUrl
         : '/junctiondealservices';
-
-    this.posts$ = this.getPosts();
-    this.comments$ = this.getComments();
-    this.users$ = this.getUsers();
   }
 
   /*
@@ -314,6 +302,7 @@ export interface IPost {
   email?: string | undefined;
   body?: string | undefined;
   comments?: Comment[] | undefined;
+  user?: User | undefined;
 }
 
 export class Post implements IPost {
@@ -323,6 +312,7 @@ export class Post implements IPost {
   email?: string | undefined;
   body?: string | undefined;
   comments?: Comment[] | undefined;
+  user?: User | undefined;
 
   constructor(data?: IPost) {
     if (data) {
