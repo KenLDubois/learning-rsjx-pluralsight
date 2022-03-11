@@ -33,9 +33,24 @@ export class PostsService {
   private errorMessageSubject = new Subject<string>();
   errorMessage$ = this.errorMessageSubject.asObservable();
 
+  // ADD POST
+  private postsAddedSubject = new Subject<Post>();
+  postsAddedAction$ = this.postsAddedSubject.asObservable();
+
+  addPost(post: Post) {
+    this.postsAddedSubject.next(post);
+  }
+
+  postsAdded$ = merge(this._posts$, this.postsAddedAction$).pipe(
+    scan(
+      (acc, value) => (value instanceof Array ? [...value] : [...acc, value]),
+      [] as Post[]
+    )
+  );
+
   // COMBINE DATA STREAMS
   postsWithUsersAndComments$ = combineLatest([
-    this._posts$,
+    this.postsAdded$,
     this.comments$,
     this.users$,
   ]).pipe(
@@ -55,38 +70,6 @@ export class PostsService {
     )
   );
 
-  // SELECT POST
-  private postSelectedSubject = new BehaviorSubject<number>(-1);
-  postSelectedAction$ = this.postSelectedSubject.asObservable();
-
-  onPostSelected(id: number) {
-    this.postSelectedSubject.next(id);
-  }
-
-  selectedPost$: Observable<Post | undefined> = combineLatest([
-    this.postsWithUsersAndComments$,
-    this.postSelectedAction$,
-  ]).pipe(
-    map(([posts, postId]) =>
-      posts.find((post) => postId > -1 && post?.id === postId)
-    )
-  );
-
-  // ADD POST
-  private postsAddedSubject = new Subject<Post>();
-  postsAddedAction$ = this.postsAddedSubject.asObservable();
-
-  postsAdded$ = merge(
-    this.postsWithUsersAndComments$,
-    this.postsAddedAction$
-  ).pipe(
-    scan(
-      (acc, value) =>
-        value instanceof Array ? [...acc, ...value] : [...acc, value],
-      [] as Post[]
-    )
-  );
-
   posts$ = combineLatest([
     this.postsWithUsersAndComments$,
     this.userSelectedAction$,
@@ -100,5 +83,22 @@ export class PostsService {
       this.errorMessageSubject.next(err);
       return EMPTY;
     })
+  );
+
+  // SELECT POST
+  private postSelectedSubject = new BehaviorSubject<number>(-1);
+  postSelectedAction$ = this.postSelectedSubject.asObservable();
+
+  onPostSelected(id: number) {
+    this.postSelectedSubject.next(id);
+  }
+
+  selectedPost$: Observable<Post | undefined> = combineLatest([
+    this.posts$,
+    this.postSelectedAction$,
+  ]).pipe(
+    map(([posts, postId]) =>
+      posts.find((post) => postId > -1 && post?.id === postId)
+    )
   );
 }

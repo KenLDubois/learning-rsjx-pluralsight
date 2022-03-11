@@ -9,6 +9,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { PostsService } from './services/posts.service';
 import { PostListComponent } from './post-list/post-list.component';
 import { PostDetailComponent } from './post-detail/post-detail.component';
+import { PostAddComponent } from './post-add/post-add.component';
 
 @NgModule({
   imports: [BrowserModule, FormsModule, HttpClientModule],
@@ -17,6 +18,7 @@ import { PostDetailComponent } from './post-detail/post-detail.component';
     HelloComponent,
     PostListComponent,
     PostDetailComponent,
+    PostAddComponent,
   ],
   providers: [
     Client,
