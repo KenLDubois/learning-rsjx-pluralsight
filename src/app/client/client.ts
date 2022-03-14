@@ -46,6 +46,7 @@ export class Client implements IClient {
    * @return Success
    */
   getPosts(): Observable<Post[]> {
+    console.log('getting posts');
     let url_ = this.baseUrl + '/posts';
     url_ = url_.replace(/[?&]$/, '');
 
@@ -128,6 +129,7 @@ export class Client implements IClient {
   }
 
   getComments(): Observable<Comment[]> {
+    console.log('getting comments');
     let url_ = this.baseUrl + '/comments';
     url_ = url_.replace(/[?&]$/, '');
 
@@ -212,6 +214,7 @@ export class Client implements IClient {
   }
 
   getUsers(): Observable<User[]> {
+    console.log('getting users');
     let url_ = this.baseUrl + '/users';
     url_ = url_.replace(/[?&]$/, '');
 

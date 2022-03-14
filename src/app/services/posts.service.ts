@@ -9,7 +9,7 @@ import {
   scan,
   Subject,
 } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, shareReplay } from 'rxjs/operators';
 import { Post, User, Comment, Client } from '../client/client';
 
 @Injectable()
@@ -79,6 +79,7 @@ export class PostsService {
         return userId && userId > -1 ? post?.userId == userId : true;
       })
     ),
+    shareReplay(1),
     catchError((err) => {
       this.errorMessageSubject.next(err);
       return EMPTY;

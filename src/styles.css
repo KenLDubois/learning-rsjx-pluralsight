@@ -3,3 +3,19 @@
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
+
+.flex {
+  display: flex;
+}
+
+.list {
+  display: inline-block;
+  background: lightgray;
+  padding: 0.5rem;
+}
+
+.posts {
+  display: inline-block;
+  flex-grow: 3;
+  padding: 0.5rem 2rem;
+}

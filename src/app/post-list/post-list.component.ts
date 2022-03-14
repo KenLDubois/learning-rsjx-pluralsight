@@ -17,6 +17,8 @@ export class PostListComponent implements OnInit {
 
   posts$ = this.service.posts$;
 
+  selection?: number;
+
   constructor(private service: PostsService) {}
 
   ngOnInit(): void {}

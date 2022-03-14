@@ -10,15 +10,20 @@ import { PostsService } from './services/posts.service';
 import { PostListComponent } from './post-list/post-list.component';
 import { PostDetailComponent } from './post-detail/post-detail.component';
 import { PostAddComponent } from './post-add/post-add.component';
+import { AppRoutingModule } from './app-routing.module';
+import { NavComponent } from './nav/nav.component';
+import { HomeComponent } from './home/home.component';
 
 @NgModule({
-  imports: [BrowserModule, FormsModule, HttpClientModule],
+  imports: [BrowserModule, FormsModule, HttpClientModule, AppRoutingModule],
   declarations: [
     AppComponent,
     HelloComponent,
     PostListComponent,
     PostDetailComponent,
     PostAddComponent,
+    NavComponent,
+    HomeComponent,
   ],
   providers: [
     Client,
