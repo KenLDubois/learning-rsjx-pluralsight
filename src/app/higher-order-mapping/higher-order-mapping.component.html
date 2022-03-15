@@ -1,1 +1,3 @@
-<p>Higher Order Mapping Works! (check the console for output)</p>
+<div *ngIf="posts$ | async as posts">
+  <p *ngFor="let post of posts">{{ post?.id }}: {{ post?.title }}</p>
+</div>

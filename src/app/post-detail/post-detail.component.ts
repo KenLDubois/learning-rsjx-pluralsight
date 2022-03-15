@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { combineLatest, filter, map } from 'rxjs';
 import { PostsService } from '../services/posts.service';
 
 @Component({
@@ -8,7 +9,18 @@ import { PostsService } from '../services/posts.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PostDetailComponent implements OnInit {
-  selectedPost$ = this.service.selectedPost$;
+  // selectedPost$ = this.service.selectedPost$;
+
+  vm$ = combineLatest([
+    this.service.selectedPost$,
+    this.service.selectedPostComments$,
+  ]).pipe(
+    filter(([post]) => Boolean(post)),
+    map(([post, comments]) => ({
+      post,
+      comments,
+    }))
+  );
 
   constructor(private service: PostsService) {}
 

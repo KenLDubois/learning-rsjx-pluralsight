@@ -25,7 +25,7 @@ import { HigherOrderMappingComponent } from './higher-order-mapping/higher-order
     PostAddComponent,
     NavComponent,
     HomeComponent,
-    HigherOrderMappingComponent,
+    HigherOrderMappingComponent
   ],
   providers: [
     Client,

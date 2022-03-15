@@ -1,8 +1,18 @@
-<div *ngIf="selectedPost$ | async as post">
-  <h2>{{ post?.title }}</h2>
+<div *ngIf="vm$ | async as vm">
+  <h2>{{ vm?.post?.title }}</h2>
   <hr />
-  <i>- {{ post?.user?.name }}</i>
+  <i>- {{ vm?.post?.user?.name }}</i>
   <br />
   <br />
-  <p>{{ post?.body }}</p>
+  <p>{{ vm?.post?.body }}</p>
+  <hr />
+  <hr />
+  <h3>Comments:</h3>
+  <div *ngFor="let comment of vm?.comments">
+    <p>{{ comment?.name }} | {{ comment?.email }}</p>
+    <p>
+      {{ comment?.body }}
+    </p>
+    <hr />
+  </div>
 </div>

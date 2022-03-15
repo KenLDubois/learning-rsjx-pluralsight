@@ -9,7 +9,7 @@ import {
   scan,
   Subject,
 } from 'rxjs';
-import { catchError, shareReplay } from 'rxjs/operators';
+import { catchError, filter, shareReplay, switchMap } from 'rxjs/operators';
 import { Post, User, Comment, Client } from '../client/client';
 
 @Injectable()
@@ -49,12 +49,8 @@ export class PostsService {
   );
 
   // COMBINE DATA STREAMS
-  postsWithUsersAndComments$ = combineLatest([
-    this.postsAdded$,
-    this.comments$,
-    this.users$,
-  ]).pipe(
-    map(([posts, comments, users]) =>
+  postsWithUser$ = combineLatest([this.postsAdded$, this.users$]).pipe(
+    map(([posts, users]) =>
       posts.map(
         (post) =>
           ({
@@ -62,18 +58,12 @@ export class PostsService {
             user: users?.find((u) => {
               return post?.userId ? u?.id == post.userId : undefined;
             }),
-            comments: comments?.filter((c) => {
-              return c?.postId && c?.postId == post?.id;
-            }),
           } as Post)
       )
     )
   );
 
-  posts$ = combineLatest([
-    this.postsWithUsersAndComments$,
-    this.userSelectedAction$,
-  ]).pipe(
+  posts$ = combineLatest([this.postsWithUser$, this.userSelectedAction$]).pipe(
     map(([posts, userId]) =>
       posts.filter((post) => {
         return userId && userId > -1 ? post?.userId == userId : true;
@@ -100,6 +90,15 @@ export class PostsService {
   ]).pipe(
     map(([posts, postId]) =>
       posts.find((post) => postId > -1 && post?.id === postId)
+    )
+  );
+
+  selectedPostComments$ = combineLatest([
+    this.selectedPost$,
+    this.comments$,
+  ]).pipe(
+    map(([post, comments]) =>
+      comments.filter((comment) => post && comment?.postId == post?.id)
     )
   );
 }

@@ -19,3 +19,7 @@
   flex-grow: 3;
   padding: 0.5rem 2rem;
 }
+
+.active {
+  font-weight: bold;
+}

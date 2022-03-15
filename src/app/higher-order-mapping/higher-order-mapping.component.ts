@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { concatMap, from, mergeMap, tap } from 'rxjs';
+import { concatMap, from, mergeMap, tap, toArray } from 'rxjs';
+import { shareReplay } from 'rxjs/operators';
 import { Client } from '../client/client';
 
 @Component({
@@ -10,14 +11,13 @@ import { Client } from '../client/client';
 export class HigherOrderMappingComponent implements OnInit {
   dealIds = [1, 3, 5];
 
+  // NOTE: To preserve original order, use 'concatMap' instead of 'mergeMap'
   posts$ = from(this.dealIds).pipe(
     mergeMap((id) => this.client.getPost(id)),
-    tap((x) => console.log(x))
+    toArray()
   );
 
   constructor(private client: Client) {}
 
-  ngOnInit() {
-    this.posts$.subscribe();
-  }
+  ngOnInit() {}
 }
