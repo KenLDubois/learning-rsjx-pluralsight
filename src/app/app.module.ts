@@ -13,6 +13,7 @@ import { PostAddComponent } from './post-add/post-add.component';
 import { AppRoutingModule } from './app-routing.module';
 import { NavComponent } from './nav/nav.component';
 import { HomeComponent } from './home/home.component';
+import { HigherOrderMappingComponent } from './higher-order-mapping/higher-order-mapping.component';
 
 @NgModule({
   imports: [BrowserModule, FormsModule, HttpClientModule, AppRoutingModule],
@@ -24,6 +25,7 @@ import { HomeComponent } from './home/home.component';
     PostAddComponent,
     NavComponent,
     HomeComponent,
+    HigherOrderMappingComponent,
   ],
   providers: [
     Client,

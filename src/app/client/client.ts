@@ -19,6 +19,7 @@ import {
 export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL'); //'https://jsonplaceholder.typicode.com';
 
 export interface IClient {
+  getPost(id: number): Observable<Post>;
   getPosts(): Observable<Post[]>;
   getComments(): Observable<Comment[]>;
   getUsers(): Observable<User[]>;
@@ -40,6 +41,89 @@ export class Client implements IClient {
       baseUrl !== undefined && baseUrl !== null
         ? baseUrl
         : '/junctiondealservices';
+  }
+
+  /*
+   * @return Success
+   */
+  getPost(id: number): Observable<Post> {
+    console.log('getting post');
+    let url_ = this.baseUrl + '/posts/{id}';
+    url_ = url_.replace('{id}', id.toString());
+    url_ = url_.replace(/[?&]$/, '');
+
+    let options_: any = {
+      body: '',
+      observe: 'response',
+      responseType: 'blob',
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+      }),
+    };
+
+    return this.http
+      .request('get', url_, options_)
+      .pipe(
+        _observableMergeMap((response_: any) => {
+          return this.processGetPost(response_);
+        })
+      )
+      .pipe(
+        _observableCatch((response_: any) => {
+          if (response_ instanceof HttpResponseBase) {
+            try {
+              return this.processGetPost(<any>response_);
+            } catch (e) {
+              // return <Observable<Post[]>>(<any>_observableThrow(e));
+              throw new Error('something went wrong.');
+            }
+          } else throw new Error('something went wrong.'); //return <Observable<Post[]>>(<any>_observableThrow(response_));
+        })
+      );
+  }
+
+  protected processGetPost(response: HttpResponseBase): Observable<Post> {
+    const status = response.status;
+    const responseBlob =
+      response instanceof HttpResponse
+        ? response.body
+        : (<any>response).error instanceof Blob
+        ? (<any>response).error
+        : undefined;
+
+    let _headers: any = {};
+    if (response.headers) {
+      for (let key of response.headers.keys()) {
+        _headers[key] = response.headers.get(key);
+      }
+    }
+    if (status === 200) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText) => {
+          let result200: any = null;
+          let resultData200 =
+            _responseText === ''
+              ? null
+              : JSON.parse(_responseText, this.jsonParseReviver);
+
+          result200 = Post.fromJS(resultData200);
+
+          return _observableOf(result200);
+        })
+      );
+    } else if (status !== 200 && status !== 204) {
+      return blobToText(responseBlob).pipe(
+        _observableMergeMap((_responseText) => {
+          return throwException(
+            'An unexpected server error occurred.',
+            status,
+            _responseText,
+            _headers
+          );
+        })
+      );
+    }
+    return new Observable<Post>();
   }
 
   /*
